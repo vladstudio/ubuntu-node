@@ -65,10 +65,10 @@ $DOMAIN_NAME {
     encode zstd gzip
 
     # Log requests to a file
-    log {
-        output file /var/log/caddy/$DOMAIN_NAME.log
-        format json
-    }
+    # log {
+    #     output file /var/log/caddy/$DOMAIN_NAME.log
+    #     format json
+    # }
 
     # Reverse proxy requests to the Node.js app
     reverse_proxy localhost:$NODE_PORT
@@ -89,10 +89,10 @@ www.$DOMAIN_NAME {
     encode zstd gzip
 
     # Log requests to a file
-    log {
-        output file /var/log/caddy/www.$DOMAIN_NAME.log # Log www separately or combine
-        format json
-    }
+    # log {
+    #     output file /var/log/caddy/www.$DOMAIN_NAME.log # Log www separately or combine
+    #     format json
+    # }
 
     # Reverse proxy requests to the Node.js app
     reverse_proxy localhost:$NODE_PORT
@@ -113,10 +113,10 @@ $DOMAIN_NAME, www.$DOMAIN_NAME {
     encode zstd gzip
 
     # Log requests to a file
-    log {
-        output file /var/log/caddy/$DOMAIN_NAME.log # Log both to the same file
-        format json
-    }
+    # log {
+    #     output file /var/log/caddy/$DOMAIN_NAME.log # Log both to the same file
+    #     format json
+    # }
 
     # Reverse proxy requests to the Node.js app
     reverse_proxy localhost:$NODE_PORT
@@ -133,10 +133,10 @@ $DOMAIN_NAME {
     encode zstd gzip
 
     # Log requests to a file
-    log {
-        output file /var/log/caddy/$DOMAIN_NAME.log
-        format json
-    }
+    # log {
+    #     output file /var/log/caddy/$DOMAIN_NAME.log
+    #     format json
+    # }
 
     # Reverse proxy requests to the Node.js app
     reverse_proxy localhost:$NODE_PORT
