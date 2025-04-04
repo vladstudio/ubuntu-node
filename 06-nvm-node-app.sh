@@ -113,10 +113,40 @@ WantedBy=default.target
 "
 echo "$SERVICE_FILE_CONTENT" > "$SERVICE_FILE"
 
-# Reload systemd user daemon, enable and start the service
-systemctl --user daemon-reload
-systemctl --user enable "$SERVICE_NAME"
-systemctl --user restart "$SERVICE_NAME" # ensure it starts fresh
+# --- Check/Configure Passwordless Sudo ---
+echo "--- Checking required passwordless sudo permissions..."
+
+SUDOERS_FILE="/etc/sudoers.d/90-$(whoami)-node-app"
+# Define commands needed for passwordless sudo
+REQUIRED_SUDO_CMDS="/usr/bin/systemctl --user daemon-reload, /usr/bin/systemctl --user enable *, /usr/bin/systemctl --user restart *, /usr/bin/systemctl --user status *, /usr/bin/loginctl enable-linger $(whoami)"
+REQUIRED_SUDOERS_LINE="$(whoami) ALL=(ALL) NOPASSWD: $REQUIRED_SUDO_CMDS"
+
+# Attempt a non-interactive sudo command. If it fails (likely asking for password), guide the user.
+# We use 'loginctl enable-linger' as a representative command to test NOPASSWD.
+if ! sudo -n loginctl enable-linger "$(whoami)" > /dev/null 2>&1; then
+    echo "----------------------------------------------------------------------" >&2
+    echo "ERROR: Passwordless sudo access is required for this script to manage" >&2
+    echo "       the systemd service and user lingering automatically." >&2
+    echo >&2
+    echo "Please run the following command to open the sudoers editor:" >&2
+    echo "  sudo visudo -f $SUDOERS_FILE" >&2
+    echo >&2
+    echo "Then, add the following single line to the file, save, and exit:" >&2
+    echo "  $REQUIRED_SUDOERS_LINE" >&2
+    echo >&2
+    echo "After adding the line, re-run this script." >&2
+    echo "----------------------------------------------------------------------" >&2
+    exit 1
+else
+    echo "--- Passwordless sudo permissions appear to be configured."
+fi
+
+# --- Continue with service setup ---
+echo "--- Reloading systemd user daemon, enabling and starting service..."
+# Reload systemd user daemon, enable and start the service using passwordless sudo
+sudo systemctl --user daemon-reload
+sudo systemctl --user enable "$SERVICE_NAME"
+sudo systemctl --user restart "$SERVICE_NAME" # ensure it starts fresh
 
 # Enable lingering for the user
 echo "--- Enabling systemd lingering for user $(whoami)..."
@@ -145,9 +175,9 @@ nvm use default
 echo 'Running build command...'
 eval \"$BUILD_COMMAND\"
 
-# Restart service
+# Restart service using passwordless sudo
 echo 'Restarting systemd service...'
-systemctl --user restart \"$SERVICE_NAME\"
+sudo systemctl --user restart \"$SERVICE_NAME\"
 
 echo '--- post-merge hook finished ---'
 exit 0
