@@ -48,12 +48,22 @@ This collection of scripts automates the setup of a fresh Ubuntu server for self
 
 **Steps:**
 
-1.  **Upload Scripts:** Copy all the `.sh` scripts to the server (e.g., using `scp`).
-2.  **Make Executable:** Log in as `root` (or a user with `sudo`) and make the scripts executable:
+1.  **Download Scripts:** Log in as `root` (or a user with `sudo`) and download the scripts from the GitHub repository:
+    ```bash
+    # Ensure git is installed
+    apt update && apt install -y git
+
+    # Clone the repository
+    git clone https://github.com/vladstudio/ubuntu-node.git
+
+    # Navigate into the script directory
+    cd ubuntu-node
+    ```
+2.  **Make Executable:** Make the scripts executable:
     ```bash
     chmod +x *.sh
     ```
-3.  **Run Initial Setup (as root):**
+3.  **Run Initial Setup (as root):** (Ensure you are inside the `ubuntu-node` directory)
     ```bash
     ./01-initial-setup.sh
     ```
@@ -63,7 +73,8 @@ This collection of scripts automates the setup of a fresh Ubuntu server for self
     ```bash
     ssh <new_username>@<your_server_ip>
     ```
-5.  **Run Remaining Scripts (as the new user):** Execute the scripts in order. They will use `sudo` internally where necessary.
+    *Note: After logging in as the new user, you might need to navigate back into the script directory (`cd ubuntu-node`) if you logged into the user's home directory.*
+5.  **Run Remaining Scripts (as the new user):** Execute the scripts in order from within the `ubuntu-node` directory. They will use `sudo` internally where necessary.
     ```bash
     ./02-locale-setup.sh # Optional: Configure locale
     ./03-ssh-setup.sh # Configure SSH key login (paste your PUBLIC key)
