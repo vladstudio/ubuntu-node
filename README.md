@@ -73,7 +73,7 @@ This collection of scripts automates the setup of a fresh Ubuntu server for self
     ```bash
     ssh <new_username>@<your_server_ip>
     ```
-    *Note: After logging in as the new user, you might need to navigate back into the script directory (`cd ubuntu-node`) if you logged into the user's home directory.*
+    *Note: After logging in as the new user, you might need to navigate back into the script directory (`cd /root/ubuntu-node`) if you logged into the user's home directory.*
 5.  **Run Remaining Scripts (as the new user):** Execute the scripts in order from within the `ubuntu-node` directory. They will use `sudo` internally where necessary.
     ```bash
     ./02-locale-setup.sh # Optional: Configure locale
