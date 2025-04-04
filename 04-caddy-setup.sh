@@ -60,8 +60,6 @@ case $WWW_CHOICE in
 $DOMAIN_NAME {
     encode zstd gzip
     reverse_proxy localhost:$NODE_PORT
-    # Set this path to your site's directory if serving static files
-    # root * /var/www/html
 }
 
 www.$DOMAIN_NAME {
@@ -74,8 +72,6 @@ www.$DOMAIN_NAME {
 www.$DOMAIN_NAME {
     encode zstd gzip
     reverse_proxy localhost:$NODE_PORT
-    # Set this path to your site's directory if serving static files
-    # root * /var/www/html
 }
 
 $DOMAIN_NAME {
@@ -88,8 +84,6 @@ $DOMAIN_NAME {
 $DOMAIN_NAME, www.$DOMAIN_NAME {
     encode zstd gzip
     reverse_proxy localhost:$NODE_PORT
-    # Set this path to your site's directory if serving static files
-    # root * /var/www/html
 }
 "
         ;;
@@ -98,8 +92,6 @@ $DOMAIN_NAME, www.$DOMAIN_NAME {
 $DOMAIN_NAME {
     encode zstd gzip
     reverse_proxy localhost:$NODE_PORT
-    # Set this path to your site's directory if serving static files
-    # root * /var/www/html
 }
 "
         ;;
