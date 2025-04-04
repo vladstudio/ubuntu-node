@@ -113,10 +113,10 @@ WantedBy=default.target
 "
 echo "$SERVICE_FILE_CONTENT" > "$SERVICE_FILE"
 
-# Reload systemd user daemon, enable and start the service
-systemctl --user daemon-reload
-systemctl --user enable "$SERVICE_NAME"
-systemctl --user restart "$SERVICE_NAME" # ensure it starts fresh
+# Reload systemd user daemon, enable and start the service using machinectl to target the user instance
+sudo machinectl shell .host --uid=$(whoami) /bin/systemctl --user daemon-reload
+sudo machinectl shell .host --uid=$(whoami) /bin/systemctl --user enable "$SERVICE_NAME"
+sudo machinectl shell .host --uid=$(whoami) /bin/systemctl --user restart "$SERVICE_NAME" # ensure it starts fresh
 
 # Enable lingering for the user
 echo "--- Enabling systemd lingering for user $(whoami)..."
@@ -147,7 +147,7 @@ eval \"$BUILD_COMMAND\"
 
 # Restart service
 echo 'Restarting systemd service...'
-systemctl --user restart \"$SERVICE_NAME\"
+sudo machinectl shell .host --uid=$(whoami) /bin/systemctl --user restart \"$SERVICE_NAME\"
 
 echo '--- post-merge hook finished ---'
 exit 0
