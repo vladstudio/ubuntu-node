@@ -6,7 +6,7 @@ set -e
 # --- User Input ---
 read -p "Enter the Git repository URL for your Node.js application: " GIT_REPO_URL
 if [ -z "$GIT_REPO_URL" ]; then
-    echo "Git repository URL cannot be empty. Exiting."
+    echo "--- Git repository URL cannot be empty. Exiting."
     exit 1
 fi
 
@@ -30,7 +30,7 @@ DEFAULT_SERVICE_NAME="my-node-app"
 read -p "Enter a name for the systemd service [default: $DEFAULT_SERVICE_NAME]: " SERVICE_NAME
 SERVICE_NAME=${SERVICE_NAME:-$DEFAULT_SERVICE_NAME}
 
-echo "Installing/Updating NVM (Node Version Manager)..."
+echo "--- Installing/Updating NVM (Node Version Manager)..."
 # Check if NVM is already installed by checking if NVM_DIR is set
 if [ -z "$NVM_DIR" ]; then
     export NVM_DIR="$HOME/.nvm"
@@ -38,7 +38,7 @@ fi
 
 # Download and run NVM install script if directory doesn't exist
 if [ ! -d "$NVM_DIR" ]; then
-    echo "Fetching latest NVM version tag from GitHub..."
+    echo "--- Fetching latest NVM version tag from GitHub..."
     # Use curl to get the latest release tag, then grep/sed to extract it
     LATEST_NVM_TAG=$(curl -s "https://api.github.com/repos/nvm-sh/nvm/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
 
@@ -47,21 +47,21 @@ if [ ! -d "$NVM_DIR" ]; then
     fi
 
     INSTALL_SCRIPT_URL="https://raw.githubusercontent.com/nvm-sh/nvm/$LATEST_NVM_TAG/install.sh"
-    echo "Installing NVM from $INSTALL_SCRIPT_URL..."
+    echo "--- Installing NVM from $INSTALL_SCRIPT_URL..."
     curl -o- "$INSTALL_SCRIPT_URL" | bash
 
     # Source NVM immediately for the rest of this script
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
     [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 else
-    echo "NVM already installed."
+    echo "--- NVM already installed."
     # Source NVM if already installed but not sourced
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 fi
 nvm --version
 
 # --- Install Node.js LTS ---
-echo "Installing latest Node.js LTS version..."
+echo "--- Installing latest Node.js LTS version..."
 nvm install --lts
 nvm use --lts
 nvm alias default 'lts/*' # Set default for future shells
@@ -70,26 +70,25 @@ npm -v
 
 # --- Clone Repository ---
 if [ -d "$CLONE_PATH" ]; then
-    echo "Directory $CLONE_PATH already exists. Skipping clone."
+    echo "--- Directory $CLONE_PATH already exists. Skipping clone."
     # Optionally, add logic here to pull latest changes if dir exists
 else
-    echo "Cloning repository from $GIT_REPO_URL into $CLONE_PATH..."
+    echo "--- Cloning repository from $GIT_REPO_URL into $CLONE_PATH..."
     git clone "$GIT_REPO_URL" "$CLONE_PATH"
 fi
 
 # --- Initial Build ---
-echo "Performing initial build..."
+echo "--- Performing initial build..."
 cd "$CLONE_PATH"
 # Ensure NVM is available for the build command
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 nvm use default # Use the default (LTS) version
 eval "$BUILD_COMMAND" # Use eval to handle commands with '&&'
-echo "Initial build complete."
 
 # --- Setup Systemd User Service ---
 SYSTEMD_USER_DIR="$HOME/.config/systemd/user"
 SERVICE_FILE="$SYSTEMD_USER_DIR/$SERVICE_NAME.service"
-echo "Setting up systemd service '$SERVICE_NAME' at $SERVICE_FILE..."
+echo "--- Setting up systemd service '$SERVICE_NAME' at $SERVICE_FILE..."
 
 mkdir -p "$SYSTEMD_USER_DIR"
 
@@ -120,13 +119,13 @@ systemctl --user enable "$SERVICE_NAME"
 systemctl --user restart "$SERVICE_NAME" # ensure it starts fresh
 
 # Enable lingering for the user
-echo "Enabling systemd lingering for user $(whoami)..."
+echo "--- Enabling systemd lingering for user $(whoami)..."
 sudo loginctl enable-linger "$(whoami)"
 
 # --- Setup Git post-merge Hook ---
 HOOK_DIR="$CLONE_PATH/.git/hooks"
 HOOK_FILE="$HOOK_DIR/post-merge"
-echo "Setting up Git hook at $HOOK_FILE..."
+echo "--- Setting up Git hook at $HOOK_FILE..."
 
 mkdir -p "$HOOK_DIR"
 
@@ -157,7 +156,8 @@ exit 0
 echo "$HOOK_CONTENT" > "$HOOK_FILE"
 chmod +x "$HOOK_FILE"
 
-echo "Your application '$SERVICE_NAME' is now running and managed by systemd."
+echo 
+echo "--- Your application '$SERVICE_NAME' is now running and managed by systemd."
 echo "Service Status: systemctl --user status $SERVICE_NAME"
 echo "Service Logs: journalctl --user -u $SERVICE_NAME -f"
 echo "To deploy updates:"
@@ -166,5 +166,5 @@ echo "2. SSH into the server."
 echo "3. Navigate to the application directory: cd $CLONE_PATH"
 echo "4. Pull the latest changes: git pull"
 echo "The post-merge hook will automatically rebuild and restart the application."
-
+echo
 exit 0
