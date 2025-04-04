@@ -9,7 +9,7 @@ Find the scripts at: https://github.com/vladstudio/ubuntu-node
 1.  **`01-initial-setup.sh`**: Initial hardening (user, UFW, fail2ban), essential tools (`git`, `curl`, etc.), unattended upgrades, journald limit, Apache removal.
 2.  **`02-locale-setup.sh`**: Configures system locale (UTF-8).
 3.  **`03-ssh-setup.sh`**: Sets up SSH key login for the current user, hardens SSHD.
-4.  **`04-caddy-setup.sh`**: Installs Caddy, configures reverse proxy with automatic HTTPS.
+4.  **`04-caddy-setup.sh`**: Installs Caddy, prompts for domain/port and www handling (redirect/serve both/ignore www), configures reverse proxy with automatic HTTPS.
 5.  **`05-nvm-node-app.sh`**: Installs NVM & Node LTS, clones Git repo, sets up systemd user service, adds `post-merge` hook for auto-rebuild/restart on `git pull`.
 
 ## Usage Instructions

@@ -20,6 +20,15 @@ if ! [[ "$NODE_PORT" =~ ^[0-9]+$ ]]; then
     exit 1
 fi
 
+# --- WWW Handling Input ---
+echo "How should the 'www' subdomain (www.$DOMAIN_NAME) be handled?"
+echo "  1) Redirect www.$DOMAIN_NAME to $DOMAIN_NAME (Recommended)"
+echo "  2) Redirect $DOMAIN_NAME to www.$DOMAIN_NAME"
+echo "  3) Serve both www.$DOMAIN_NAME and $DOMAIN_NAME (No redirect)"
+echo "  4) Only serve $DOMAIN_NAME (Ignore www)"
+read -p "Enter choice [1]: " WWW_CHOICE
+WWW_CHOICE=${WWW_CHOICE:-1}
+
 echo "--- Starting Caddy Setup for $DOMAIN_NAME proxying to localhost:$NODE_PORT ---"
 
 # --- Install Caddy ---
@@ -42,7 +51,80 @@ caddy version
 
 # --- Configure Caddyfile ---
 echo "--- Configuring Caddyfile (/etc/caddy/Caddyfile)..."
-CADDYFILE_CONTENT="
+
+# Generate Caddyfile based on www choice
+CADDYFILE_CONTENT=""
+case $WWW_CHOICE in
+    1) # Redirect www to non-www
+        CADDYFILE_CONTENT="
+$DOMAIN_NAME {
+    # Set this path to your site's directory if serving static files
+    # root * /var/www/html
+
+    # Enable compression
+    encode zstd gzip
+
+    # Log requests to a file
+    log {
+        output file /var/log/caddy/$DOMAIN_NAME.log
+        format json
+    }
+
+    # Reverse proxy requests to the Node.js app
+    reverse_proxy localhost:$NODE_PORT
+}
+
+www.$DOMAIN_NAME {
+    redir https://$DOMAIN_NAME{uri} permanent
+}
+"
+        ;;
+    2) # Redirect non-www to www
+        CADDYFILE_CONTENT="
+www.$DOMAIN_NAME {
+    # Set this path to your site's directory if serving static files
+    # root * /var/www/html
+
+    # Enable compression
+    encode zstd gzip
+
+    # Log requests to a file
+    log {
+        output file /var/log/caddy/www.$DOMAIN_NAME.log # Log www separately or combine
+        format json
+    }
+
+    # Reverse proxy requests to the Node.js app
+    reverse_proxy localhost:$NODE_PORT
+}
+
+$DOMAIN_NAME {
+    redir https://www.$DOMAIN_NAME{uri} permanent
+}
+"
+        ;;
+    3) # Serve both www and non-www
+        CADDYFILE_CONTENT="
+$DOMAIN_NAME, www.$DOMAIN_NAME {
+    # Set this path to your site's directory if serving static files
+    # root * /var/www/html
+
+    # Enable compression
+    encode zstd gzip
+
+    # Log requests to a file
+    log {
+        output file /var/log/caddy/$DOMAIN_NAME.log # Log both to the same file
+        format json
+    }
+
+    # Reverse proxy requests to the Node.js app
+    reverse_proxy localhost:$NODE_PORT
+}
+"
+        ;;
+    4) # Serve only non-www
+        CADDYFILE_CONTENT="
 $DOMAIN_NAME {
     # Set this path to your site's directory if serving static files
     # root * /var/www/html
@@ -60,6 +142,13 @@ $DOMAIN_NAME {
     reverse_proxy localhost:$NODE_PORT
 }
 "
+        ;;
+    *)
+        echo "--- Invalid choice. Exiting. ---"
+        exit 1
+        ;;
+esac
+
 
 # Write the configuration to Caddyfile
 echo "$CADDYFILE_CONTENT" | sudo tee /etc/caddy/Caddyfile > /dev/null
@@ -72,24 +161,24 @@ sudo ufw allow https
 sudo ufw status verbose | grep -E '80/tcp|443/tcp' || echo "Warning: Ports 80/443 might not be open in UFW."
 
 # --- Validate and Reload Caddy ---
+echo "--- Validating Caddy configuration..."
 # Use sudo to run as root, necessary for reading /etc/caddy/Caddyfile
 if sudo caddy validate --config /etc/caddy/Caddyfile; then
-    echo "--- Validating Caddy configuration..."
-    echo "echo "--- Reloading Caddy service..."
+    echo "--- Caddy configuration validation successful."
+    echo "--- Reloading Caddy service..."
     sudo systemctl reload caddy
 else
     echo "--- ERROR: Caddy configuration validation failed. Please check /etc/caddy/Caddyfile manually. Caddy service was not reloaded."
     exit 1
 fi
 
-echo
 echo "--- Caddy Setup Complete ---"
-echo "Caddy is configured to serve $DOMAIN_NAME and reverse proxy to your Node.js app on localhost:$NODE_PORT."
+echo "Caddy is configured to serve $DOMAIN_NAME (and potentially www.$DOMAIN_NAME based on your choice) and reverse proxy to your Node.js app on localhost:$NODE_PORT."
 echo "IMPORTANT:"
-echo "1. Ensure your DNS 'A' and/or 'AAAA' records for '$DOMAIN_NAME' point to this server's public IP address."
+echo "1. Ensure your DNS 'A' and/or 'AAAA' records for '$DOMAIN_NAME' (and 'www.$DOMAIN_NAME' if applicable) point to this server's public IP address."
 echo "2. Make sure your Node.js application is running and listening on port $NODE_PORT on localhost (127.0.0.1)."
-echo "3. Caddy will automatically obtain and renew SSL certificates for $DOMAIN_NAME via Let's Encrypt."
-echo "4. Check Caddy logs at /var/log/caddy/$DOMAIN_NAME.log for details."
+echo "3. Caddy will automatically obtain and renew SSL certificates via Let's Encrypt."
+echo "4. Check Caddy logs (e.g., /var/log/caddy/$DOMAIN_NAME.log) for details."
 echo
 
 exit 0
