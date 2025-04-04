@@ -3,8 +3,6 @@
 # This script helps generate an SSH key pair for deploying code from a private repository (e.g., GitHub).
 # It should be run as the user who will own the application code and run the deployment script (05-nvm-node-app.sh).
 
-echo "--- SSH Deploy Key Generation ---"
-
 # --- User Input ---
 DEFAULT_KEY_FILENAME="$HOME/.ssh/deploy_key"
 read -p "Enter filename for the new SSH key pair [default: $DEFAULT_KEY_FILENAME]: " KEY_FILENAME
@@ -20,9 +18,9 @@ mkdir -p "$SSH_DIR"
 chmod 700 "$SSH_DIR"
 
 if [ -f "$KEY_FILENAME" ]; then
-    echo "Key file '$KEY_FILENAME' already exists. Skipping generation."
+    echo "--- Key file '$KEY_FILENAME' already exists. Skipping generation."
 else
-    echo "Generating ED25519 key pair..."
+    echo "--- Generating ED25519 key pair..."
     # Generate key without passphrase
     ssh-keygen -t ed25519 -C "$KEY_COMMENT" -f "$KEY_FILENAME" -N "" # -N "" ensures no passphrase
     chmod 600 "$KEY_FILENAME"
@@ -92,6 +90,5 @@ echo "--- Important Reminder ---"
 echo "When running script '05-nvm-node-app.sh', make sure to use the SSH URL for your repository:"
 echo "Example: git@github.com:your_username/your_repo.git"
 echo ""
-echo "--- Deploy Key Setup Helper Finished ---"
 
 exit 0

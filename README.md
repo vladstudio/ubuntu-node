@@ -41,15 +41,13 @@ Find the scripts at: https://github.com/vladstudio/ubuntu-node
 4.  **Run Remaining Scripts:**
     ```bash
     cd ~/ubuntu-node # Or the name of the cloned directory
-
-    # --- Run Setup Scripts ---
     ./02-locale-setup.sh # Optional
     ./03-ssh-setup.sh    # Paste YOUR PERSONAL PUBLIC key when prompted
     ./04-caddy-setup.sh    # Enter domain, Node.js port
 
-    # --- IF USING A PRIVATE GITHUB REPO ---
-    # Run this script BEFORE script 06
-    ./05-generate-deploy-key.sh # Follow prompts to generate key and add to GitHub
+    # --- If using a private github repo ---
+    # --- Run this script BEFORE script 06 ---
+    ./05-generate-deploy-key.sh
 
     # --- Deploy Application ---
     ./06-nvm-node-app.sh # Enter Git URL (use SSH URL for private), paths, commands
