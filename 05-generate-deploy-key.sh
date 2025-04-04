@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script helps generate an SSH key pair for deploying code from a private repository (e.g., GitHub).
-# It should be run as the user who will own the application code and run the deployment script (05-nvm-node-app.sh).
+# It should be run as the user who will own the application code and run the deployment script (06-nvm-node-app.sh).
 
 # --- User Input ---
 DEFAULT_KEY_FILENAME="$HOME/.ssh/deploy_key"
@@ -70,8 +70,8 @@ Host github.com
         echo "Added github.com configuration to $SSH_CONFIG_FILE."
     fi
 else
-    echo "Skipping automatic SSH client configuration."
-    echo "You may need to manually specify the key using 'ssh -i $KEY_FILENAME ...' or configure ~/.ssh/config yourself."
+    echo "--- Skipping automatic SSH client configuration."
+    echo "--- You may need to manually specify the key using 'ssh -i $KEY_FILENAME ...' or configure ~/.ssh/config yourself."
 fi
 
 # --- Test Connection ---
@@ -79,15 +79,15 @@ echo ""
 echo "--- Testing SSH Connection to GitHub ---"
 echo "Attempting to authenticate with GitHub using the new key..."
 if ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
-    echo "SUCCESS: SSH connection to GitHub using the deploy key is working."
+    echo "--- SUCCESS: SSH connection to GitHub using the deploy key is working."
 else
-    echo "WARNING: SSH connection test failed. Check GitHub deploy key setup and SSH configuration."
+    echo "--- WARNING: SSH connection test failed. Check GitHub deploy key setup and SSH configuration."
 fi
 
 # --- Final Reminder ---
 echo ""
 echo "--- Important Reminder ---"
-echo "When running script '05-nvm-node-app.sh', make sure to use the SSH URL for your repository:"
+echo "When running script '06-nvm-node-app.sh', make sure to use the SSH URL for your repository:"
 echo "Example: git@github.com:your_username/your_repo.git"
 echo ""
 

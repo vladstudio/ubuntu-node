@@ -22,7 +22,7 @@ DEFAULT_BUILD_OUTPUT_DIR="dist"
 read -p "Enter the relative path to the build output directory within the repo [default: $DEFAULT_BUILD_OUTPUT_DIR]: " BUILD_OUTPUT_DIR
 BUILD_OUTPUT_DIR=${BUILD_OUTPUT_DIR:-$DEFAULT_BUILD_OUTPUT_DIR}
 
-DEFAULT_START_COMMAND="node $BUILD_OUTPUT_DIR/server.js" # Example, adjust if needed
+DEFAULT_START_COMMAND="node $BUILD_OUTPUT_DIR/server/entry.js"
 read -p "Enter the command to start the built application (relative to clone path) [default: '$DEFAULT_START_COMMAND']: " START_COMMAND
 START_COMMAND=${START_COMMAND:-$DEFAULT_START_COMMAND}
 
