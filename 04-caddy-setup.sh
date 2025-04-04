@@ -58,20 +58,10 @@ case $WWW_CHOICE in
     1) # Redirect www to non-www
         CADDYFILE_CONTENT="
 $DOMAIN_NAME {
+    encode zstd gzip
+    reverse_proxy localhost:$NODE_PORT
     # Set this path to your site's directory if serving static files
     # root * /var/www/html
-
-    # Enable compression
-    encode zstd gzip
-
-    # Log requests to a file
-    # log {
-    #     output file /var/log/caddy/$DOMAIN_NAME.log
-    #     format json
-    # }
-
-    # Reverse proxy requests to the Node.js app
-    reverse_proxy localhost:$NODE_PORT
 }
 
 www.$DOMAIN_NAME {
@@ -82,20 +72,10 @@ www.$DOMAIN_NAME {
     2) # Redirect non-www to www
         CADDYFILE_CONTENT="
 www.$DOMAIN_NAME {
+    encode zstd gzip
+    reverse_proxy localhost:$NODE_PORT
     # Set this path to your site's directory if serving static files
     # root * /var/www/html
-
-    # Enable compression
-    encode zstd gzip
-
-    # Log requests to a file
-    # log {
-    #     output file /var/log/caddy/www.$DOMAIN_NAME.log # Log www separately or combine
-    #     format json
-    # }
-
-    # Reverse proxy requests to the Node.js app
-    reverse_proxy localhost:$NODE_PORT
 }
 
 $DOMAIN_NAME {
@@ -106,40 +86,20 @@ $DOMAIN_NAME {
     3) # Serve both www and non-www
         CADDYFILE_CONTENT="
 $DOMAIN_NAME, www.$DOMAIN_NAME {
+    encode zstd gzip
+    reverse_proxy localhost:$NODE_PORT
     # Set this path to your site's directory if serving static files
     # root * /var/www/html
-
-    # Enable compression
-    encode zstd gzip
-
-    # Log requests to a file
-    # log {
-    #     output file /var/log/caddy/$DOMAIN_NAME.log # Log both to the same file
-    #     format json
-    # }
-
-    # Reverse proxy requests to the Node.js app
-    reverse_proxy localhost:$NODE_PORT
 }
 "
         ;;
     4) # Serve only non-www
         CADDYFILE_CONTENT="
 $DOMAIN_NAME {
+    encode zstd gzip
+    reverse_proxy localhost:$NODE_PORT
     # Set this path to your site's directory if serving static files
     # root * /var/www/html
-
-    # Enable compression
-    encode zstd gzip
-
-    # Log requests to a file
-    # log {
-    #     output file /var/log/caddy/$DOMAIN_NAME.log
-    #     format json
-    # }
-
-    # Reverse proxy requests to the Node.js app
-    reverse_proxy localhost:$NODE_PORT
 }
 "
         ;;
