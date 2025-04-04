@@ -13,8 +13,8 @@ echo "--- Updating system packages..."
 sudo apt update
 sudo apt upgrade -y
 
-echo "--- Installing essential tools (git, wget, curl, fail2ban, unattended-upgrades)..."
-sudo apt install -y git wget curl fail2ban micro unattended-upgrades
+echo "--- Installing essential tools (git, wget, curl, fail2ban, micro, unattended-upgrades, systemd-container)..."
+sudo apt install -y git wget curl fail2ban micro unattended-upgrades systemd-container
 
 echo "--- Configuring automatic security updates..."
 sudo dpkg-reconfigure --priority=low unattended-upgrades
