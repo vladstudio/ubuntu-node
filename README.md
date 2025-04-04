@@ -34,8 +34,9 @@ Find the scripts at: https://github.com/vladstudio/ubuntu-node
     # Log out from root, then log in as the new user
     ssh <new_username>@<server_ipv4_address> # Script 01 attempts to show the IPv4
     ```
-4.  **Run Remaining Scripts (as new user):** Navigate back to the script directory (`cd /root/ubuntu-node` or wherever it was cloned) and run:
+4.  **Run Remaining Scripts (as new user):** Navigate into the home directory and run the scripts:
     ```bash
+    cd ~/ubuntu-node # Or the name of the cloned directory
     ./02-locale-setup.sh # Optional
     ./03-ssh-setup.sh    # Paste PUBLIC key when prompted
     ./04-caddy-setup.sh    # Enter domain, Node.js port

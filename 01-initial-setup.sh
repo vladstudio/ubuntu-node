@@ -39,6 +39,17 @@ else
     echo "Set password for user '$NEW_USERNAME':"
     sudo passwd "$NEW_USERNAME"
     sudo usermod -aG sudo "$NEW_USERNAME"
+
+    # --- Move scripts to new user's home directory ---
+    echo "Moving setup scripts to /home/$NEW_USERNAME/ubuntu-node..."
+    # Assuming the script is run from the cloned 'ubuntu-node' directory
+    SCRIPT_DIR_NAME=$(basename "$PWD") # Should be 'ubuntu-node'
+    TARGET_DIR="/home/$NEW_USERNAME/$SCRIPT_DIR_NAME"
+    # Move the current directory (where the script is running from)
+    sudo mv "$PWD" "/home/$NEW_USERNAME/"
+    # Change ownership to the new user
+    sudo chown -R "$NEW_USERNAME:$NEW_USERNAME" "$TARGET_DIR"
+    echo "Scripts moved and ownership set for $NEW_USERNAME."
 fi
 
 echo "Configuring UFW firewall..."
