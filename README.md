@@ -29,12 +29,11 @@ Find the scripts at: https://github.com/vladstudio/ubuntu-node
     ```bash
     ./01-initial-setup.sh # Follow prompts for new username/password
     ```
-3.  **Log in as New User:**
+3.  **Log out, then log in as the new user:**
     ```bash
-    # Log out from root, then log in as the new user
     ssh <new_username>@<server_ipv4_address> # Script 01 attempts to show the IPv4
     ```
-4.  **Run Remaining Scripts (as new user):** Navigate into the home directory and run the scripts:
+4.  **Run Remaining Scripts:**
     ```bash
     cd ~/ubuntu-node # Or the name of the cloned directory
     ./02-locale-setup.sh # Optional
