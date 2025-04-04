@@ -83,11 +83,10 @@ echo "Restarting SSH service..."
 sudo systemctl restart sshd
 
 # --- Get Public IP ---
-echo "Fetching public IP address..."
-# Use curl (installed in 01-initial-setup.sh) to get the public IP; provide fallback
-# Ensure curl is installed before running this script or add 'sudo apt install -y curl' here if needed.
-SERVER_IP=$(curl -s ifconfig.me || echo "your_server_ip")
-echo "Detected public IP: $SERVER_IP"
+echo "Fetching public IPv4 address..."
+# Use curl -4 to force IPv4 (curl installed in 01-initial-setup.sh); provide fallback
+SERVER_IP=$(curl -4 -s ifconfig.me || echo "your_server_ip")
+echo "Detected public IPv4: $SERVER_IP"
 
 echo "--- SSH Setup Complete ---"
 echo "Password authentication is now disabled. Ensure you can log in as user '$(whoami)' using your SSH key:"

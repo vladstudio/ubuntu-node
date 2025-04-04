@@ -73,10 +73,10 @@ fi
 sudo systemctl restart systemd-journald
 echo "Systemd journald service restarted."
 
-echo "Fetching public IP address..."
-# Use curl (installed earlier) to get the public IP; provide fallback
-SERVER_IP=$(curl -s ifconfig.me || echo "your_server_ip")
-echo "Detected public IP: $SERVER_IP"
+echo "Fetching public IPv4 address..."
+# Use curl -4 to force IPv4; provide fallback
+SERVER_IP=$(curl -4 -s ifconfig.me || echo "your_server_ip")
+echo "Detected public IPv4: $SERVER_IP"
 
 echo "--- Initial Server Setup Complete ---"
 echo "IMPORTANT: To continue, log out and log back in as the new user '$NEW_USERNAME'."
