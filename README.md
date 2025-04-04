@@ -7,11 +7,13 @@ This collection of scripts automates the setup of a fresh Ubuntu server for self
 1.  **`01-initial-setup.sh`**:
     *   Performs initial server hardening.
     *   Updates system packages.
-    *   Installs essential tools (`git`, `wget`, `curl`, `fail2ban`).
+    *   Installs essential tools (`git`, `wget`, `curl`, `fail2ban`, `unattended-upgrades`).
+    *   Configures `unattended-upgrades` for automatic security updates.
     *   Removes Apache if present.
     *   Sets up UFW firewall rules (allows SSH, HTTP, HTTPS).
     *   Creates a new non-root user with `sudo` privileges.
     *   Enables `fail2ban`.
+    *   Limits systemd journal size to 1GB.
 
 2.  **`02-locale-setup.sh`**:
     *   Configures the system locale for optimal UTF-8 compatibility.

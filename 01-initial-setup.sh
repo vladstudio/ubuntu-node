@@ -16,8 +16,11 @@ echo "Updating system packages..."
 sudo apt update
 sudo apt upgrade -y
 
-echo "Installing essential tools (git, wget, curl, fail2ban)..."
-sudo apt install -y git wget curl fail2ban micro
+echo "Installing essential tools (git, wget, curl, fail2ban, unattended-upgrades)..."
+sudo apt install -y git wget curl fail2ban micro unattended-upgrades
+
+echo "Configuring automatic security updates..."
+sudo dpkg-reconfigure --priority=low unattended-upgrades
 
 # Check if apache2 service exists and is active before trying to remove
 if systemctl list-units --type=service --all | grep -q 'apache2.service'; then
@@ -51,6 +54,24 @@ echo "Enabling and starting Fail2ban..."
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 sudo systemctl status fail2ban --no-pager
+
+# --- Configure Journald Size Limit ---
+echo "Configuring systemd journal size limit..."
+JOURNALD_CONF="/etc/systemd/journald.conf"
+# Check if SystemMaxUse is already set (commented or uncommented)
+if sudo grep -qE "^\s*#?\s*SystemMaxUse=" "$JOURNALD_CONF"; then
+    # Uncomment and set the value
+    sudo sed -i -E "s/^\s*#?\s*(SystemMaxUse=).*/\11G/" "$JOURNALD_CONF"
+    echo "Set SystemMaxUse=1G in $JOURNALD_CONF"
+else
+    # Add the setting if it doesn't exist at all
+    echo "[Journal]" | sudo tee -a "$JOURNALD_CONF" > /dev/null
+    echo "SystemMaxUse=1G" | sudo tee -a "$JOURNALD_CONF" > /dev/null
+    echo "Added SystemMaxUse=1G to $JOURNALD_CONF"
+fi
+# Restart journald service to apply changes
+sudo systemctl restart systemd-journald
+echo "Systemd journald service restarted."
 
 echo "Fetching public IP address..."
 # Use curl (installed earlier) to get the public IP; provide fallback
