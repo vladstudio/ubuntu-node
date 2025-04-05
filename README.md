@@ -11,7 +11,7 @@ Find the scripts at: https://github.com/vladstudio/ubuntu-node
 3.  **`03-ssh-setup.sh`**: Sets up SSH key login for the current user, hardens SSHD.
 4.  **`04-caddy-setup.sh`**: Installs Caddy, prompts for domain/port and www handling (redirect/serve both/ignore www), configures reverse proxy with automatic HTTPS.
 5.  **`05-generate-deploy-key.sh`**: Helper script to generate an SSH key pair for accessing private Git repositories and configure the SSH client. Run *before* script 06 if using a private repo.
-6.  **`06-nvm-node-app.sh`**: Installs NVM & Node LTS, clones Git repo (using SSH URL for private repos), sets up systemd user service, adds `post-merge` hook for auto-rebuild/restart on `git pull`.
+6.  **`06-nvm-node-app.sh`**: Installs NVM & Node LTS, clones Git repo (using SSH URL for private repos), sets up systemd service, adds `post-merge` hook for auto-rebuild/restart on `git pull`.
 
 ## Usage Instructions
 
@@ -56,6 +56,6 @@ Find the scripts at: https://github.com/vladstudio/ubuntu-node
 
 **Post-Setup:**
 
-*   App runs via systemd user service (`systemctl --user status <service_name>`).
-*   Deploy updates: `ssh` in as the user, `cd <CLONE_PATH>`, `git pull`.
-*   Logs: `journalctl --user -u <service_name> -f` and `/var/log/caddy/<domain_name>.log`.
+*   App runs via systemd system service (`sudo systemctl status <service_name>`).
+*   Deploy updates: `ssh` in as the user, `cd <CLONE_PATH>`, `git pull`. (Requires passwordless sudo for the hook to restart the service).
+*   Logs: `sudo journalctl -u <service_name> -f` and `/var/log/caddy/<domain_name>.log`.
