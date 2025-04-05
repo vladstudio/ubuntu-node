@@ -87,9 +87,10 @@ echo "--- Detected public IPv4: $SERVER_IP"
 
 echo
 echo "--- --------------------------"
-echo "--- Initial Server Setup Complete --"
-echo "IMPORTANT: To continue, log out and log back in as the new user '$NEW_USERNAME'."
-echo "Example: ssh $NEW_USERNAME@$SERVER_IP"
+echo "--- Initial Server Setup Complete."
+echo "--- IMPORTANT:"
+echo "--- To continue, log out and log back in as the new user '$NEW_USERNAME'."
+echo "--- Example: ssh $NEW_USERNAME@$SERVER_IP"
 echo "--- --------------------------"
 echo
 
