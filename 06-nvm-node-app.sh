@@ -30,6 +30,12 @@ DEFAULT_SERVICE_NAME="my-node-app"
 read -p "Enter a name for the systemd service [default: $DEFAULT_SERVICE_NAME]: " SERVICE_NAME
 SERVICE_NAME=${SERVICE_NAME:-$DEFAULT_SERVICE_NAME}
 
+# Validate service name
+if ! [[ "$SERVICE_NAME" =~ ^[a-zA-Z0-9_.-]+$ ]]; then
+    echo "--- Invalid service name '$SERVICE_NAME'. Please use only alphanumeric characters, underscore, dot, or hyphen. Exiting."
+    exit 1
+fi
+
 echo "--- Installing/Updating NVM (Node Version Manager)..."
 # Check if NVM is already installed by checking if NVM_DIR is set
 if [ -z "$NVM_DIR" ]; then
@@ -139,18 +145,17 @@ After=network.target
 [Service]
 Environment=NODE_ENV=production
 Type=simple
-User=$(whoami) # Run as the user executing this script
-Group=$(id -gn $(whoami)) # Run as the primary group of the user
+User=$(whoami)
+Group=$(id -gn $(whoami))
 WorkingDirectory=$CLONE_PATH
-# Use absolute path to home for NVM sourcing
 ExecStart=/bin/bash -c 'export NVM_DIR=\"$HOME/.nvm\" && [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\" && nvm use default && $START_COMMAND'
 Restart=on-failure
 RestartSec=10
 
 [Install]
-WantedBy=multi-user.target # Target for system services
+WantedBy=multi-user.target 
 "
-# Use sudo tee to write the service file content
+
 echo "--- Writing service file $SERVICE_FILE (requires sudo)..."
 echo "$SERVICE_FILE_CONTENT" | sudo tee "$SERVICE_FILE" > /dev/null
 
