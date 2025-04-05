@@ -48,6 +48,8 @@ else
     sudo chown -R "$NEW_USERNAME:$NEW_USERNAME" "$TARGET_DIR"
 fi
 
+echo "$(whoami) ALL=(ALL) NOPASSWD: /usr/bin/systemctl" | sudo tee /etc/sudoers.d/$(whoami) > /dev/null
+
 echo "--- Configuring UFW firewall..."
 sudo ufw default deny incoming
 sudo ufw default allow outgoing

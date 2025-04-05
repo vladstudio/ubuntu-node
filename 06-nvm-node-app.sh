@@ -114,14 +114,11 @@ WantedBy=default.target
 "
 echo "$SERVICE_FILE_CONTENT" > "$SERVICE_FILE"
 
-# --- Reload, Enable, and Start Service ---
-echo "--- Reloading systemd user daemon, enabling and starting service via machinectl..."
-# Use machinectl to interact with the user's systemd instance
-sudo /usr/bin/machinectl shell .host --uid=$(whoami) /bin/systemctl --user daemon-reload
-sudo /usr/bin/machinectl shell .host --uid=$(whoami) /bin/systemctl --user enable "$SERVICE_NAME"
-sudo /usr/bin/machinectl shell .host --uid=$(whoami) /bin/systemctl --user restart "$SERVICE_NAME" # ensure it starts fresh
+echo "--- Reloading systemd user daemon, enabling and starting service..."
+/usr/bin/systemctl --user daemon-reload
+/usr/bin/systemctl --user enable "$SERVICE_NAME"
+/usr/bin/systemctl --user restart "$SERVICE_NAME" # ensure it starts fresh
 
-# Enable lingering for the user (loginctl doesn't need machinectl)
 echo "--- Enabling systemd lingering for user $(whoami)..."
 sudo /usr/bin/loginctl enable-linger "$(whoami)"
 
@@ -134,23 +131,18 @@ mkdir -p "$HOOK_DIR"
 
 HOOK_CONTENT="#!/bin/bash
 echo '--- Running post-merge hook ---'
-# Source NVM
 export NVM_DIR=\"$HOME/.nvm\"
 [ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\"
 
-# Navigate to repo
 cd \"$CLONE_PATH\" || exit 1
 
-# Use correct Node version
 nvm use default
 
-# Run build
-echo 'Running build command...'
+echo '--- Running build command...'
 eval \"$BUILD_COMMAND\"
 
-# Restart service using machinectl
-echo 'Restarting systemd service...'
-sudo /usr/bin/machinectl shell .host --uid=$(whoami) /bin/systemctl --user restart \"$SERVICE_NAME\"
+echo '--- Restarting systemd service...'
+/usr/bin/systemctl --user restart \"$SERVICE_NAME\"
 
 echo '--- post-merge hook finished ---'
 exit 0
