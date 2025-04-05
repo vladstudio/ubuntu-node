@@ -5,8 +5,8 @@ set -e
 
 # --- User Input ---
 echo "--- This script configures SSH key authentication for the current user ($(whoami))."
-echo "--- Please paste the entire content of your PUBLIC SSH key (e.g., id_rsa.pub):"
-echo "--- Usually can be optained with cat ~/.ssh/id_rsa.pub"
+echo "--- Please paste the entire content of your PUBLIC SSH key (e.g., id_rsa.pub)."
+echo "--- Usually can be obtained with cat ~/.ssh/id_rsa.pub"
 read -p "Public Key: " PUBLIC_KEY
 if [ -z "$PUBLIC_KEY" ]; then
     echo "--- Public key cannot be empty. Exiting."
