@@ -59,7 +59,9 @@ case $WWW_CHOICE in
         CADDYFILE_CONTENT="
 $DOMAIN_NAME {
     encode zstd gzip
-    reverse_proxy localhost:$NODE_PORT
+    reverse_proxy http://localhost:$NODE_PORT {
+        header_up Host {upstream_hostport}
+    }
 }
 
 www.$DOMAIN_NAME {
@@ -71,7 +73,9 @@ www.$DOMAIN_NAME {
         CADDYFILE_CONTENT="
 www.$DOMAIN_NAME {
     encode zstd gzip
-    reverse_proxy localhost:$NODE_PORT
+    reverse_proxy http://localhost:$NODE_PORT {
+        header_up Host {upstream_hostport}
+    }
 }
 
 $DOMAIN_NAME {
@@ -83,7 +87,9 @@ $DOMAIN_NAME {
         CADDYFILE_CONTENT="
 $DOMAIN_NAME, www.$DOMAIN_NAME {
     encode zstd gzip
-    reverse_proxy localhost:$NODE_PORT
+    reverse_proxy http://localhost:$NODE_PORT {
+        header_up Host {upstream_hostport}
+    }
 }
 "
         ;;
@@ -91,7 +97,9 @@ $DOMAIN_NAME, www.$DOMAIN_NAME {
         CADDYFILE_CONTENT="
 $DOMAIN_NAME {
     encode zstd gzip
-    reverse_proxy localhost:$NODE_PORT
+    reverse_proxy http://localhost:$NODE_PORT {
+        header_up Host {upstream_hostport}
+    }
 }
 "
         ;;

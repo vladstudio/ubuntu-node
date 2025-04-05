@@ -56,6 +56,6 @@ Find the scripts at: https://github.com/vladstudio/ubuntu-node
 
 **Post-Setup:**
 
-*   App runs via systemd system service (`sudo systemctl status <service_name>`).
-*   Deploy updates: `ssh` in as the user, `cd <CLONE_PATH>`, `git pull`. (Requires passwordless sudo for the hook to restart the service).
+*   App runs via systemd service (`sudo systemctl status <service_name>`).
+*   Deploy updates: `ssh` in as the user, `cd <CLONE_PATH>`, `git pull`.
 *   Logs: `sudo journalctl -u <service_name> -f` and `/var/log/caddy/<domain_name>.log`.
