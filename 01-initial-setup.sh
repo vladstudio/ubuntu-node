@@ -85,10 +85,12 @@ echo "--- Fetching public IPv4 address..."
 SERVER_IP=$(curl -4 -s ifconfig.me || echo "your_server_ip")
 echo "--- Detected public IPv4: $SERVER_IP"
 
-echo "--- Initial Server Setup Complete --"
 echo
+echo "--- --------------------------"
+echo "--- Initial Server Setup Complete --"
 echo "IMPORTANT: To continue, log out and log back in as the new user '$NEW_USERNAME'."
 echo "Example: ssh $NEW_USERNAME@$SERVER_IP"
+echo "--- --------------------------"
 echo
 
 exit 0

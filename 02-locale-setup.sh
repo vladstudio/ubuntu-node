@@ -46,7 +46,9 @@ locale
 
 
 echo
+echo "--- --------------------------"
 echo "--- Locale Setup Complete ---"
 echo "System locale set to $SELECTED_LOCALE. A system reboot might be required for all applications to pick up the change."
+echo "--- --------------------------"
 echo
 exit 0

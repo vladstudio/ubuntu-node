@@ -117,40 +117,47 @@ nvm use default # Use the default (LTS) version
 eval "$BUILD_COMMAND" # Use eval to handle commands with '&&'
 
 
-# --- Setup Systemd User Service ---
-SYSTEMD_USER_DIR="$HOME/.config/systemd/user"
-SERVICE_FILE="$SYSTEMD_USER_DIR/$SERVICE_NAME.service"
+# --- Setup Systemd System Service ---
+SYSTEMD_SYSTEM_DIR="/etc/systemd/system"
+SERVICE_FILE="$SYSTEMD_SYSTEM_DIR/$SERVICE_NAME.service"
 echo "--- Setting up systemd service '$SERVICE_NAME' at $SERVICE_FILE..."
 
-mkdir -p "$SYSTEMD_USER_DIR"
+# System directory requires sudo to write
+if [ ! -d "$SYSTEMD_SYSTEM_DIR" ]; then
+    echo "--- Creating systemd directory $SYSTEMD_SYSTEM_DIR (requires sudo)..."
+    sudo mkdir -p "$SYSTEMD_SYSTEM_DIR"
+fi
 
 # Create the service file content
-# Note: We use /bin/bash -ic to ensure NVM is loaded correctly from .bashrc/.profile
-# Alternatively, explicitly source NVM as shown below. Explicit sourcing is often more reliable.
+# Note: Explicitly sourcing NVM using the user's home directory who runs this script.
+# The service will run as the user executing this setup script.
+# Consider creating a dedicated system user ('nodeapp', 'www-data') for better security.
 SERVICE_FILE_CONTENT="[Unit]
-Description=$SERVICE_NAME
+Description=$SERVICE_NAME Node.js Application
 After=network.target
 
 [Service]
 Environment=NODE_ENV=production
 Type=simple
+User=$(whoami) # Run as the user executing this script
+Group=$(id -gn $(whoami)) # Run as the primary group of the user
 WorkingDirectory=$CLONE_PATH
-ExecStart=/bin/bash -c 'export NVM_DIR="%h/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && nvm use default && $START_COMMAND'
+# Use absolute path to home for NVM sourcing
+ExecStart=/bin/bash -c 'export NVM_DIR=\"$HOME/.nvm\" && [ -s \"\$NVM_DIR/nvm.sh\" ] && . \"\$NVM_DIR/nvm.sh\" && nvm use default && $START_COMMAND'
 Restart=on-failure
 RestartSec=10
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target # Target for system services
 "
-echo "$SERVICE_FILE_CONTENT" > "$SERVICE_FILE"
+# Use sudo tee to write the service file content
+echo "--- Writing service file $SERVICE_FILE (requires sudo)..."
+echo "$SERVICE_FILE_CONTENT" | sudo tee "$SERVICE_FILE" > /dev/null
 
-echo "--- Reloading systemd user daemon, enabling and starting service..."
-/usr/bin/systemctl --user daemon-reload
-/usr/bin/systemctl --user enable "$SERVICE_NAME"
-/usr/bin/systemctl --user restart "$SERVICE_NAME" # ensure it starts fresh
-
-echo "--- Enabling systemd lingering for user $(whoami)..."
-sudo /usr/bin/loginctl enable-linger "$(whoami)"
+echo "--- Reloading systemd daemon, enabling and starting service..."
+sudo systemctl daemon-reload
+sudo systemctl enable "$SERVICE_NAME"
+sudo systemctl restart "$SERVICE_NAME" # ensure it starts fresh
 
 # --- Setup Git post-merge Hook ---
 HOOK_DIR="$CLONE_PATH/.git/hooks"
@@ -172,8 +179,8 @@ echo '--- Running build command...'
 eval \"$BUILD_COMMAND\"
 
 echo '--- Restarting systemd service...'
-/usr/bin/systemctl --user restart \"$SERVICE_NAME\"
-/usr/bin/systemctl --user daemon-reload
+sudo systemctl restart \"$SERVICE_NAME\"
+sudo systemctl daemon-reload
 
 echo '--- post-merge hook finished ---'
 exit 0
@@ -182,15 +189,18 @@ exit 0
 echo "$HOOK_CONTENT" > "$HOOK_FILE"
 chmod +x "$HOOK_FILE"
 
-echo 
-echo "--- Your application '$SERVICE_NAME' is now running and managed by systemd."
-echo "Service Status: systemctl --user status $SERVICE_NAME"
-echo "Service Logs: journalctl --user -u $SERVICE_NAME -f"
-echo "To deploy updates:"
-echo "1. Commit your changes locally."
-echo "2. SSH into the server."
-echo "3. Navigate to the application directory: cd $CLONE_PATH"
-echo "4. Pull the latest changes: git pull"
-echo "The post-merge hook will automatically rebuild and restart the application."
+echo
+echo "--- --------------------------"
+echo "--- Your application '$SERVICE_NAME' is now running and managed by systemd as a system service."
+echo "--- Service Status: sudo systemctl status $SERVICE_NAME"
+echo "--- Service Logs: sudo journalctl -u $SERVICE_NAME -f"
+echo "--- NOTE: The service runs as user '$(whoami)'. For production, consider a dedicated user."
+echo "--- To deploy updates:"
+echo "--- 1. Commit your changes locally."
+echo "--- 2. SSH into the server."
+echo "--- 3. Navigate to the application directory: cd $CLONE_PATH"
+echo "--- 4. Pull the latest changes: git pull"
+echo "--- The post-merge hook will automatically rebuild and restart the application."
+echo "--- --------------------------"
 echo
 exit 0

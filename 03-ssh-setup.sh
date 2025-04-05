@@ -89,9 +89,11 @@ echo "--- Fetching public IPv4 address..."
 SERVER_IP=$(curl -4 -s ifconfig.me || echo "your_server_ip")
 
 echo
+echo "--- --------------------------"
 echo "--- SSH Setup Complete ---"
 echo "Password authentication is now disabled. Ensure you can log in as user '$(whoami)' using your SSH key:"
 echo "ssh -i /path/to/your/private_key $(whoami)@$SERVER_IP"
 echo "If you encounter issues, the original sshd_config was backed up to $BACKUP_FILE."
+echo "--- --------------------------"
 echo
 exit 0

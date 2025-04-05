@@ -125,12 +125,14 @@ else
 fi
 
 echo
+echo "--- --------------------------"
 echo "--- Caddy Setup Complete ---"
 echo "Caddy is configured to serve $DOMAIN_NAME (and potentially www.$DOMAIN_NAME based on your choice) and reverse proxy to your Node.js app on localhost:$NODE_PORT."
 echo "IMPORTANT:"
 echo "1. Ensure your DNS 'A' and/or 'AAAA' records for '$DOMAIN_NAME' (and 'www.$DOMAIN_NAME' if applicable) point to this server's public IP address."
 echo "2. Make sure your Node.js application is running and listening on port $NODE_PORT on localhost (127.0.0.1)."
 echo "3. Caddy will automatically obtain and renew SSL certificates via Let's Encrypt."
+echo "--- --------------------------"
 echo
 
 exit 0

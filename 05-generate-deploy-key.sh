@@ -86,9 +86,11 @@ fi
 
 # --- Final Reminder ---
 echo ""
+echo "--- --------------------------"
 echo "--- Important Reminder ---"
 echo "When running script '06-nvm-node-app.sh', make sure to use the SSH URL for your repository:"
 echo "Example: git@github.com:your_username/your_repo.git"
+echo "--- --------------------------"
 echo ""
 
 exit 0
