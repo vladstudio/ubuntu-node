@@ -77,6 +77,37 @@ else
     git clone "$GIT_REPO_URL" "$CLONE_PATH"
 fi
 
+# --- Optional .env file creation ---
+read -p "Do you want to create an environment file (.env) in $CLONE_PATH? [y/N]: " CREATE_ENV_CHOICE
+if [[ "$CREATE_ENV_CHOICE" =~ ^[Yy]$ ]]; then
+    DEFAULT_ENV_FILENAME=".env"
+    read -p "Enter the filename for the environment file [default: $DEFAULT_ENV_FILENAME]: " ENV_FILENAME
+    ENV_FILENAME=${ENV_FILENAME:-$DEFAULT_ENV_FILENAME}
+    ENV_FILE_PATH="$CLONE_PATH/$ENV_FILENAME"
+    GITIGNORE_PATH="$CLONE_PATH/.gitignore"
+
+    echo "--- Creating environment file $ENV_FILE_PATH if it doesn't exist..."
+    touch "$ENV_FILE_PATH" # Creates if not exists, updates timestamp if exists
+
+    touch "$GITIGNORE_PATH"
+    if ! grep -qxF "$ENV_FILENAME" "$GITIGNORE_PATH"; then
+        echo "$ENV_FILENAME" >> "$GITIGNORE_PATH"
+        echo "--- Added $ENV_FILENAME to $GITIGNORE_PATH."
+    else
+        echo "--- $ENV_FILENAME already exists in $GITIGNORE_PATH."
+    fi
+
+    echo "--- An empty file will open now."
+    echo "--- Please add your environment variables, save (Ctrl-S), and close the editor (Ctrl-Q)."
+    read -p "--- Press Enter to continue:"
+    if command -v micro &> /dev/null; then
+        micro "$ENV_FILE_PATH"
+    else
+        nano "$ENV_FILE_PATH" # Fallback to nano if micro not found
+    fi
+fi
+
+
 # --- Initial Build ---
 echo "--- Performing initial build..."
 cd "$CLONE_PATH"
@@ -97,15 +128,14 @@ mkdir -p "$SYSTEMD_USER_DIR"
 # Note: We use /bin/bash -ic to ensure NVM is loaded correctly from .bashrc/.profile
 # Alternatively, explicitly source NVM as shown below. Explicit sourcing is often more reliable.
 SERVICE_FILE_CONTENT="[Unit]
-Description=Node.js Application Service ($SERVICE_NAME)
+Description=$SERVICE_NAME
 After=network.target
 
 [Service]
 Environment=NODE_ENV=production
 Type=simple
-User=$(whoami)
 WorkingDirectory=$CLONE_PATH
-ExecStart=/bin/bash -c 'export NVM_DIR=\"$HOME/.nvm\" && [ -s \"\$NVM_DIR/nvm.sh\" ] && \\. \"\$NVM_DIR/nvm.sh\" && nvm use default && $START_COMMAND'
+ExecStart=/bin/bash -c 'export NVM_DIR="%h/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh" && nvm use default && $START_COMMAND'
 Restart=on-failure
 RestartSec=10
 
@@ -143,6 +173,7 @@ eval \"$BUILD_COMMAND\"
 
 echo '--- Restarting systemd service...'
 /usr/bin/systemctl --user restart \"$SERVICE_NAME\"
+/usr/bin/systemctl --user daemon-reload
 
 echo '--- post-merge hook finished ---'
 exit 0
