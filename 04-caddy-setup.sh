@@ -143,6 +143,12 @@ sudo ufw allow http
 sudo ufw allow https
 sudo ufw status verbose | grep -E '80/tcp|443/tcp' || echo "Warning: Ports 80/443 might not be open in UFW."
 
+# --- Create log directory ---
+echo "--- Creating Caddy log directory..."
+sudo mkdir -p /var/log/caddy
+sudo chown caddy:caddy /var/log/caddy
+sudo chmod 755 /var/log/caddy
+
 # --- Validate and Reload Caddy ---
 echo "--- Validating Caddy configuration..."
 # Use sudo to run as root, necessary for reading /etc/caddy/Caddyfile
