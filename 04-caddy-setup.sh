@@ -52,56 +52,72 @@ caddy version
 # --- Configure Caddyfile ---
 echo "--- Configuring Caddyfile (/etc/caddy/Caddyfile)..."
 
-# Generate Caddyfile based on www choice
-CADDYFILE_CONTENT=""
+# Create conf.d directory for modular configs
+CADDY_CONF_DIR="/etc/caddy/conf.d"
+sudo mkdir -p "$CADDY_CONF_DIR"
+
+# Generate app-specific config
+APP_CONFIG_FILE="$CADDY_CONF_DIR/main-app.conf"
+APP_CONFIG_CONTENT=""
+
 case $WWW_CHOICE in
     1) # Redirect www to non-www
-        CADDYFILE_CONTENT="
-$DOMAIN_NAME {
+        APP_CONFIG_CONTENT="$DOMAIN_NAME {
     encode zstd gzip
     reverse_proxy http://localhost:$NODE_PORT {
         header_up Host {upstream_hostport}
+    }
+    log {
+        output file /var/log/caddy/$DOMAIN_NAME.log
     }
 }
 
 www.$DOMAIN_NAME {
     redir https://$DOMAIN_NAME{uri} permanent
-}
-"
+    log {
+        output file /var/log/caddy/www.$DOMAIN_NAME.log
+    }
+}"
         ;;
     2) # Redirect non-www to www
-        CADDYFILE_CONTENT="
-www.$DOMAIN_NAME {
+        APP_CONFIG_CONTENT="www.$DOMAIN_NAME {
     encode zstd gzip
     reverse_proxy http://localhost:$NODE_PORT {
         header_up Host {upstream_hostport}
+    }
+    log {
+        output file /var/log/caddy/www.$DOMAIN_NAME.log
     }
 }
 
 $DOMAIN_NAME {
     redir https://www.$DOMAIN_NAME{uri} permanent
-}
-"
+    log {
+        output file /var/log/caddy/$DOMAIN_NAME.log
+    }
+}"
         ;;
     3) # Serve both www and non-www
-        CADDYFILE_CONTENT="
-$DOMAIN_NAME, www.$DOMAIN_NAME {
+        APP_CONFIG_CONTENT="$DOMAIN_NAME, www.$DOMAIN_NAME {
     encode zstd gzip
     reverse_proxy http://localhost:$NODE_PORT {
         header_up Host {upstream_hostport}
     }
-}
-"
+    log {
+        output file /var/log/caddy/$DOMAIN_NAME.log
+    }
+}"
         ;;
     4) # Serve only non-www
-        CADDYFILE_CONTENT="
-$DOMAIN_NAME {
+        APP_CONFIG_CONTENT="$DOMAIN_NAME {
     encode zstd gzip
     reverse_proxy http://localhost:$NODE_PORT {
         header_up Host {upstream_hostport}
     }
-}
-"
+    log {
+        output file /var/log/caddy/$DOMAIN_NAME.log
+    }
+}"
         ;;
     *)
         echo "--- Invalid choice. Exiting. ---"
@@ -109,9 +125,16 @@ $DOMAIN_NAME {
         ;;
 esac
 
+# Write app-specific config
+echo "$APP_CONFIG_CONTENT" | sudo tee "$APP_CONFIG_FILE" > /dev/null
 
-# Write the configuration to Caddyfile
-echo "$CADDYFILE_CONTENT" | sudo tee /etc/caddy/Caddyfile > /dev/null
+# Create main Caddyfile that imports all configs
+MAIN_CADDYFILE_CONTENT="# Main Caddyfile - imports all app configurations
+import $CADDY_CONF_DIR/*.conf
+"
+
+# Write the main Caddyfile
+echo "$MAIN_CADDYFILE_CONTENT" | sudo tee /etc/caddy/Caddyfile > /dev/null
 
 # --- Ensure Firewall Rules ---
 echo "--- Ensuring UFW allows HTTP and HTTPS traffic..."
