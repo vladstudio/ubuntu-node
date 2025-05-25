@@ -215,9 +215,6 @@ sudo mkdir -p "$CADDY_CONF_DIR"
 # Generate Caddy config based on www choice
 CADDY_CONFIG_FILE="$CADDY_CONF_DIR/$APP_NAME.conf"
 CADDY_CONFIG_CONTENT=""
-sudo touch /var/log/caddy/$DOMAIN_NAME.log
-sudo chown caddy:caddy /var/log/caddy/$DOMAIN_NAME.log
-sudo chmod 755 /var/log/caddy/$DOMAIN_NAME.log
 
 case $WWW_CHOICE in
     1) # Redirect www to non-www
@@ -281,6 +278,21 @@ $DOMAIN_NAME {
 esac
 
 echo "$CADDY_CONFIG_CONTENT" | sudo tee "$CADDY_CONFIG_FILE" > /dev/null
+
+# --- Setup log files with correct ownership ---
+echo "--- Setting up Caddy log files..."
+sudo touch /var/log/caddy/$DOMAIN_NAME.log
+sudo chown caddy:caddy /var/log/caddy/$DOMAIN_NAME.log
+sudo chmod 644 /var/log/caddy/$DOMAIN_NAME.log
+
+# Also handle www log file if needed
+case $WWW_CHOICE in
+    1|2) 
+        sudo touch /var/log/caddy/www.$DOMAIN_NAME.log
+        sudo chown caddy:caddy /var/log/caddy/www.$DOMAIN_NAME.log
+        sudo chmod 644 /var/log/caddy/www.$DOMAIN_NAME.log
+        ;;
+esac
 
 # --- Update main Caddyfile to import configs ---
 MAIN_CADDYFILE="/etc/caddy/Caddyfile"

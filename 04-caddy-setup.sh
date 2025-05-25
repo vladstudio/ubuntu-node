@@ -136,18 +136,18 @@ import $CADDY_CONF_DIR/*.conf
 # Write the main Caddyfile
 echo "$MAIN_CADDYFILE_CONTENT" | sudo tee /etc/caddy/Caddyfile > /dev/null
 
+# --- Create log directory ---
+echo "--- Creating Caddy log directory..."
+sudo mkdir -p /var/log/caddy
+sudo chown caddy:caddy -R /var/log/caddy
+sudo chmod 755 -R /var/log/caddy
+
 # --- Ensure Firewall Rules ---
 echo "--- Ensuring UFW allows HTTP and HTTPS traffic..."
 # These should already be allowed by 01-initial-setup.sh, but we double-check
 sudo ufw allow http
 sudo ufw allow https
 sudo ufw status verbose | grep -E '80/tcp|443/tcp' || echo "Warning: Ports 80/443 might not be open in UFW."
-
-# --- Create log directory ---
-echo "--- Creating Caddy log directory..."
-sudo mkdir -p /var/log/caddy
-sudo chown caddy:caddy -R /var/log/caddy
-sudo chmod 755 -R /var/log/caddy
 
 # --- Validate and Reload Caddy ---
 echo "--- Validating Caddy configuration..."
