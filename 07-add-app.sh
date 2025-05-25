@@ -215,6 +215,9 @@ sudo mkdir -p "$CADDY_CONF_DIR"
 # Generate Caddy config based on www choice
 CADDY_CONFIG_FILE="$CADDY_CONF_DIR/$APP_NAME.conf"
 CADDY_CONFIG_CONTENT=""
+sudo touch /var/log/caddy/$DOMAIN_NAME.log
+sudo chown caddy:caddy /var/log/caddy/$DOMAIN_NAME.log
+sudo chmod 755 /var/log/caddy/$DOMAIN_NAME.log
 
 case $WWW_CHOICE in
     1) # Redirect www to non-www
