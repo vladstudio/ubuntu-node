@@ -81,7 +81,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "--- Restarting SSH service..."
-sudo systemctl restart sshd
+sudo systemctl restart ssh
 
 # --- Get Public IP ---
 echo "--- Fetching public IPv4 address..."
