@@ -111,7 +111,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 if ! command -v nvm &> /dev/null; then
-    echo "--- ERROR: NVM not found. Please run 06-nvm-node-app.sh first or install NVM manually. Exiting."
+    echo "--- ERROR: NVM not found. Please run 06-nvm-node-setup.sh first or install NVM manually. Exiting."
     exit 1
 fi
 

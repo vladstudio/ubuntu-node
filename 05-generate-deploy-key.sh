@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This script helps generate an SSH key pair for deploying code from a private repository (e.g., GitHub).
-# It should be run as the user who will own the application code and run the deployment script (06-nvm-node-app.sh).
+# It should be run as the user who will own the application code and run the deployment script (07-add-app.sh).
 
 # --- User Input ---
 DEFAULT_KEY_FILENAME="$HOME/.ssh/deploy_key"

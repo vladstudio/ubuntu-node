@@ -146,8 +146,8 @@ sudo ufw status verbose | grep -E '80/tcp|443/tcp' || echo "Warning: Ports 80/44
 # --- Create log directory ---
 echo "--- Creating Caddy log directory..."
 sudo mkdir -p /var/log/caddy
-sudo chown caddy:caddy /var/log/caddy
-sudo chmod 755 /var/log/caddy
+sudo chown caddy:caddy -R /var/log/caddy
+sudo chmod 755 -R /var/log/caddy
 
 # --- Validate and Reload Caddy ---
 echo "--- Validating Caddy configuration..."
