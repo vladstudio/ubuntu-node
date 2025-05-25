@@ -136,11 +136,6 @@ import $CADDY_CONF_DIR/*.conf
 # Write the main Caddyfile
 echo "$MAIN_CADDYFILE_CONTENT" | sudo tee /etc/caddy/Caddyfile > /dev/null
 
-# --- Create log directory ---
-echo "--- Creating Caddy log directory..."
-sudo mkdir -p /var/log/caddy
-sudo chown caddy:caddy -R /var/log/caddy
-sudo chmod 755 -R /var/log/caddy
 
 # --- Ensure Firewall Rules ---
 echo "--- Ensuring UFW allows HTTP and HTTPS traffic..."
@@ -154,6 +149,13 @@ echo "--- Validating Caddy configuration..."
 # Use sudo to run as root, necessary for reading /etc/caddy/Caddyfile
 if sudo caddy validate --config /etc/caddy/Caddyfile; then
     echo "--- Caddy configuration validation successful."
+    echo "--- Creating Caddy logs..."
+    sudo mkdir -p /var/log/caddy
+    sudo chown caddy:caddy -R /var/log/caddy
+    sudo chmod 755 -R /var/log/caddy
+    sudo touch /var/log/caddy/$DOMAIN_NAME.log
+    sudo chown caddy:caddy /var/log/caddy/$DOMAIN_NAME.log
+    sudo chmod 644 /var/log/caddy/$DOMAIN_NAME.log
     echo "--- Reloading Caddy service..."
     sudo systemctl reload caddy
 else
