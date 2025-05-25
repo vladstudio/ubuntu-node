@@ -3,6 +3,18 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
+# --- Ubuntu Version Check ---
+echo "--- Checking Ubuntu version..."
+UBUNTU_VERSION=$(lsb_release -r -s)
+UBUNTU_MAJOR=$(echo "$UBUNTU_VERSION" | cut -d. -f1)
+UBUNTU_MINOR=$(echo "$UBUNTU_VERSION" | cut -d. -f2)
+
+if [ "$UBUNTU_MAJOR" -lt 24 ] || ([ "$UBUNTU_MAJOR" -eq 24 ] && [ "$UBUNTU_MINOR" -lt 4 ]); then
+    echo "--- ERROR: Ubuntu 24.04 or later is required. Current version: $UBUNTU_VERSION. Exiting."
+    exit 1
+fi
+echo "--- Ubuntu $UBUNTU_VERSION detected (✓ Compatible)"
+
 read -p "Enter the username for the new non-root user: " NEW_USERNAME
 if [ -z "$NEW_USERNAME" ]; then
     echo "Username cannot be empty. Exiting."

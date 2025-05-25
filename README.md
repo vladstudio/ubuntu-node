@@ -1,6 +1,6 @@
 # Ubuntu Node.js Server Setup Scripts
 
-Automates setting up a fresh Ubuntu server for self-hosting multiple Node.js apps using NVM, Caddy, and Git deployment.
+Automates setting up a fresh Ubuntu 24.04+ server for self-hosting multiple Node.js apps using NVM, Caddy, and Git deployment.
 
 Find the scripts at: https://github.com/vladstudio/ubuntu-node
 
@@ -17,7 +17,7 @@ Find the scripts at: https://github.com/vladstudio/ubuntu-node
 ## Usage Instructions
 
 **Prerequisites:**
-*   Fresh Ubuntu server.
+*   Fresh Ubuntu 24.04+ server.
 *   Root/sudo access initially.
 *   Your personal SSH public key (for script `03-ssh-setup.sh`).
 *   Node.js app Git repo URL (use SSH URL for private repos).
