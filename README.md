@@ -49,8 +49,8 @@ Find the scripts at: https://github.com/vladstudio/ubuntu-node
 5.  **Run Remaining Scripts:**
     ```bash
     cd ~/ubuntu-node # Or the name of the cloned directory
-    ./03-ssh-setup.sh      # Paste YOUR PERSONAL PUBLIC key when prompted
-    ./04-caddy-setup.sh    # Enter domain for main app, Node.js port
+    ./03-ssh-setup.sh # Paste YOUR PERSONAL PUBLIC key when prompted
+    ./04-caddy-setup.sh
 
     # --- If using a private github repo ---
     # --- Run this script BEFORE deploying apps ---
@@ -60,7 +60,7 @@ Find the scripts at: https://github.com/vladstudio/ubuntu-node
     ./06-nvm-node-setup.sh # Installs NVM & Node LTS
 
     # --- Deploy Your First App ---
-    ./07-add-app.sh        # Enter app name, domain, Git URL, etc.
+    ./07-add-app.sh # Enter app name, domain, Git URL, etc.
     ```
     *Follow prompts in each script.*
 
